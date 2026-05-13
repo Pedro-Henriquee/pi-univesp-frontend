@@ -1,32 +1,29 @@
 {
-  "name": "pi_univesp",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "lint": "eslint .",
     "preview": "vite preview"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Pedro-Henriquee/pi_univesp.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/Pedro-Henriquee/pi_univesp/issues"
-  },
-  "homepage": "https://github.com/Pedro-Henriquee/pi_univesp#readme",
   "dependencies": {
-    "bcrypt": "^6.0.0",
-    "body-parser": "^2.2.2",
-    "cors": "^2.8.6",
-    "express": "^5.2.1",
-    "jsonwebtoken": "^9.0.3",
-    "mysql2": "^3.22.3",
-    "sequelize": "^6.37.8"
+    "axios": "^1.15.2",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "react-router-dom": "^7.14.2",
+    "@vitejs/plugin-react": "^6.0.1",
+    "vite": "^8.0.10"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "eslint": "^10.2.1",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "globals": "^17.5.0"
   }
 }
