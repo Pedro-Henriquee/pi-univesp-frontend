@@ -45,7 +45,6 @@ function App() {
         <Route path="/escalas" element={<RotaAdmin><Escalas /></RotaAdmin>} />
         <Route path="/tarefas" element={<RotaAdmin><Tarefas /></RotaAdmin>} />
         <Route path="/perfil/:id" element={<RotaPrivada><Perfil /></RotaPrivada>} />
-        <Route path="/ver-perfil" element={<RotaPrivada><Perfil /></RotaPrivada>} />
         
       </Routes>
     </BrowserRouter>

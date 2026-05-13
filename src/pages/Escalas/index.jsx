@@ -37,7 +37,7 @@ function Escalas() {
   async function carregarDados() {
     const [respostaFuncionarios, respostaEscalas] = await Promise.all([
       api.get("/funcionarios"),
-      api.get("/escalas/escalas"),
+      api.get("/escalas"),
     ]);
 
     setFuncionarios(respostaFuncionarios.data);
@@ -49,7 +49,7 @@ function Escalas() {
 
     Promise.all([
       api.get("/funcionarios"),
-      api.get("/escalas/escalas"),
+      api.get("/escalas"),
     ]).then(([respostaFuncionarios, respostaEscalas]) => {
       if (!ativo) return;
       setFuncionarios(respostaFuncionarios.data);
@@ -139,10 +139,10 @@ function Escalas() {
         };
 
         if (dadosDia.id) {
-          return api.put(`/escalas/escalas/${dadosDia.id}`, payload);
+          return api.put(`/escalas/${dadosDia.id}`, payload);
         }
 
-        return api.post("/escalas/escalas/criar", payload);
+        return api.post("/escalas/criar", payload);
       });
 
       await Promise.all(requisicoes);
@@ -164,7 +164,7 @@ function Escalas() {
         (escala) => Number(escala.funcionario_id) === Number(funcionarioId)
       );
       await Promise.all(
-        escalasFuncionario.map((escala) => api.delete(`/escalas/escalas/${escala.id}`))
+        escalasFuncionario.map((escala) => api.delete(`/escalas/${escala.id}`))
       );
       await carregarDados();
       alert("Escala excluída com sucesso!");

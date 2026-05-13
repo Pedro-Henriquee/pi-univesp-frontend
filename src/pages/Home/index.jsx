@@ -27,7 +27,7 @@ function VisaoGeral() {
 
   async function carregarDadosFuncionario(id) {
     try {
-      const respostaTarefas = await api.get("/tarefas/tarefas");
+      const respostaTarefas = await api.get("/tarefas");
 
       const tarefasDoFuncionario = respostaTarefas.data
         .filter((tarefa) => String(tarefa.funcionario_id) === String(id))
@@ -40,7 +40,7 @@ function VisaoGeral() {
       setTarefas(tarefasDoFuncionario);
 
       try {
-        const respostaEscala = await api.get(`/escalas/escalas/${id}`);
+        const respostaEscala = await api.get(`/escalas/${id}`);
 
         const escalaFormatada = formatarEscalas(respostaEscala.data);
 
@@ -77,8 +77,8 @@ function VisaoGeral() {
       });
     } else if (usuarioLogado?.id) {
       Promise.all([
-        api.get("/tarefas/tarefas"),
-        api.get(`/escalas/escalas/${usuarioLogado.id}`).catch(() => ({ data: [] })),
+        api.get("/tarefas"),
+        api.get(`/escalas/${usuarioLogado.id}`).catch(() => ({ data: [] })),
       ]).then(([respostaTarefas, respostaEscala]) => {
         if (!ativo) return;
 

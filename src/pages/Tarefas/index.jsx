@@ -22,7 +22,7 @@ function Tarefas() {
 
   async function carregarTarefas() {
     try {
-      const resposta = await api.get("/tarefas/tarefas");
+      const resposta = await api.get("/tarefas");
 
       const tarefasFormatadas = resposta.data.map((item) => ({
         id: item.tarefa_id || item.id,
@@ -45,7 +45,7 @@ function Tarefas() {
     let ativo = true;
 
     Promise.all([
-      api.get("/tarefas/tarefas"),
+      api.get("/tarefas"),
       api.get("/funcionarios"),
     ]).then(([respostaTarefas, respostaFuncionarios]) => {
       if (!ativo) return;
@@ -94,7 +94,7 @@ function Tarefas() {
 
     try {
       if (modoEdicao) {
-        await api.put(`/tarefas/tarefas/${idEdicao}`, {
+        await api.put(`/tarefas/${idEdicao}`, {
           titulo: tarefa.titulo,
           descricao: tarefa.descricao,
           funcionario_id: tarefa.responsavel,
@@ -103,7 +103,7 @@ function Tarefas() {
 
         alert("Tarefa editada com sucesso!");
       } else {
-        await api.post("/tarefas/tarefas/criar", {
+        await api.post("/tarefas/criar", {
           titulo: tarefa.titulo,
           descricao: tarefa.descricao,
           funcionario_id: tarefa.responsavel,
@@ -125,7 +125,7 @@ function Tarefas() {
     try {
       const confirmarExcluirTarefa = window.confirm("Tem certeza que deseja excluir a tarefa?");
       if (!confirmarExcluirTarefa) return;
-      await api.delete(`/tarefas/tarefas/${id}`);
+      await api.delete(`/tarefas/${id}`);
       alert("Tarefa excluída com sucesso!");
       carregarTarefas();
     } catch (error) {
