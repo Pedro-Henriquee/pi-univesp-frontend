@@ -91,7 +91,7 @@
 
 .tabela {
   width: 100%;
-  min-width: 560px;
+  min-width: 680px;
   border-collapse: collapse;
   background: #fff;
 }
@@ -184,5 +184,12 @@
   .btnCancelar {
     width: 100%;
     text-align: center;
+  }
+
+  .btnAdmin,
+  .btnEditar,
+  .btnExcluir {
+    padding: 5px 8px;
+    font-size: 11px;
   }
 }
