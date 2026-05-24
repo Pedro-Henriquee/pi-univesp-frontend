@@ -8,23 +8,14 @@ function Tarefas() {
   const [modoEdicao, setModoEdicao] = useState(false);
   const [idEdicao, setIdEdicao] = useState(null);
   const [busca, setBusca] = useState("");
-
   const [funcionarios, setFuncionarios] = useState([]);
-
-  const [tarefa, setTarefa] = useState({
-    titulo: "",
-    descricao: "",
-    responsavel: "",
-    prazo: "",
-  });
-
+  const [tarefa, setTarefa] = useState({ titulo: "", descricao: "", responsavel: "", prazo: "" });
   const [tarefas, setTarefas] = useState([]);
 
   async function carregarTarefas() {
     try {
       const resposta = await api.get("/tarefas");
-
-      const tarefasFormatadas = resposta.data.map((item) => ({
+      setTarefas(resposta.data.map((item) => ({
         id: item.tarefa_id || item.id,
         titulo: item.titulo,
         descricao: item.descricao,
@@ -32,66 +23,43 @@ function Tarefas() {
         funcionario_id: item.funcionario_id,
         prazo: formatarDataBR(item.prazo),
         prazoInput: item.prazo ? item.prazo.substring(0, 10) : "",
-      }));
-
-      setTarefas(tarefasFormatadas);
+      })));
     } catch (error) {
-      console.error(error);
       alert("Erro ao carregar tarefas do banco.");
     }
   }
 
   useEffect(() => {
     let ativo = true;
-
-    Promise.all([
-      api.get("/tarefas"),
-      api.get("/funcionarios"),
-    ]).then(([respostaTarefas, respostaFuncionarios]) => {
-      if (!ativo) return;
-
-      const tarefasFormatadas = respostaTarefas.data.map((item) => ({
-        id: item.tarefa_id || item.id,
-        titulo: item.titulo,
-        descricao: item.descricao,
-        responsavel: item.funcionario_nome || "Sem responsável",
-        funcionario_id: item.funcionario_id,
-        prazo: formatarDataBR(item.prazo),
-        prazoInput: item.prazo ? item.prazo.substring(0, 10) : "",
-      }));
-
-      setTarefas(tarefasFormatadas);
-      setFuncionarios(respostaFuncionarios.data);
-    });
-
-    return () => {
-      ativo = false;
-    };
+    Promise.all([api.get("/tarefas"), api.get("/funcionarios")]).then(
+      ([respostaTarefas, respostaFuncionarios]) => {
+        if (!ativo) return;
+        setTarefas(respostaTarefas.data.map((item) => ({
+          id: item.tarefa_id || item.id,
+          titulo: item.titulo,
+          descricao: item.descricao,
+          responsavel: item.funcionario_nome || "Sem responsável",
+          funcionario_id: item.funcionario_id,
+          prazo: formatarDataBR(item.prazo),
+          prazoInput: item.prazo ? item.prazo.substring(0, 10) : "",
+        })));
+        setFuncionarios(respostaFuncionarios.data);
+      }
+    );
+    return () => { ativo = false; };
   }, []);
 
   function limparFormulario() {
-    setTarefa({
-      titulo: "",
-      descricao: "",
-      responsavel: "",
-      prazo: "",
-    });
-
+    setTarefa({ titulo: "", descricao: "", responsavel: "", prazo: "" });
     setModoEdicao(false);
     setIdEdicao(null);
   }
 
   async function salvarTarefa() {
-    if (
-      !tarefa.titulo ||
-      !tarefa.descricao ||
-      !tarefa.responsavel ||
-      !tarefa.prazo
-    ) {
+    if (!tarefa.titulo || !tarefa.descricao || !tarefa.responsavel || !tarefa.prazo) {
       alert("Preencha todos os campos obrigatórios!");
       return;
     }
-
     try {
       if (modoEdicao) {
         await api.put(`/tarefas/${idEdicao}`, {
@@ -100,7 +68,6 @@ function Tarefas() {
           funcionario_id: tarefa.responsavel,
           prazo: tarefa.prazo,
         });
-
         alert("Tarefa editada com sucesso!");
       } else {
         await api.post("/tarefas/criar", {
@@ -109,36 +76,39 @@ function Tarefas() {
           funcionario_id: tarefa.responsavel,
           prazo: tarefa.prazo,
         });
-
         alert("Tarefa criada no banco!");
       }
-
       limparFormulario();
       carregarTarefas();
     } catch (error) {
-      console.error(error);
       alert("Erro ao salvar tarefa no banco.");
     }
   }
 
   async function excluirTarefa(id) {
+    if (!window.confirm("Tem certeza que deseja excluir a tarefa?")) return;
     try {
-      const confirmarExcluirTarefa = window.confirm("Tem certeza que deseja excluir a tarefa?");
-      if (!confirmarExcluirTarefa) return;
       await api.delete(`/tarefas/${id}`);
       alert("Tarefa excluída com sucesso!");
       carregarTarefas();
     } catch (error) {
-      console.error(error);
       alert("Erro ao excluir tarefa.");
     }
   }
 
-  return (
+  const tarefasFiltradas = tarefas.filter((t) => {
+    const termo = busca.toLowerCase();
+    return (
+      t.titulo.toLowerCase().includes(termo) ||
+      t.descricao.toLowerCase().includes(termo) ||
+      t.responsavel.toLowerCase().includes(termo)
+    );
+  });
 
+  return (
     <Layout title="Gestão - Tarefas" ativo="Gestão de Tarefas">
       <div className="containerTarefas">
-        <div className="buscaTarefasContainer">
+        <div>
           <label className="buscaTarefasLabel">Buscar tarefa</label>
           <div className="buscaTarefasInputContainer">
             <span className="buscaTarefasIcone">🔍</span>
@@ -147,7 +117,8 @@ function Tarefas() {
               className="buscaTarefasInput"
               type="text"
               value={busca}
-              onChange={(e) => setBusca(e.target.value)} />
+              onChange={(e) => setBusca(e.target.value)}
+            />
           </div>
         </div>
 
@@ -161,78 +132,53 @@ function Tarefas() {
             type="text"
             placeholder="Título da tarefa *"
             value={tarefa.titulo}
-            onChange={(e) =>
-              setTarefa({ ...tarefa, titulo: e.target.value })
-            }
+            onChange={(e) => setTarefa({ ...tarefa, titulo: e.target.value })}
           />
-
           <input
             className="inputDescricao"
             type="text"
             placeholder="Descrição *"
             value={tarefa.descricao}
-            onChange={(e) =>
-              setTarefa({ ...tarefa, descricao: e.target.value })
-            }
+            onChange={(e) => setTarefa({ ...tarefa, descricao: e.target.value })}
           />
-
           <select
             className="inputResponsavel"
             value={tarefa.responsavel}
-            onChange={(e) =>
-              setTarefa({ ...tarefa, responsavel: e.target.value })
-            }
+            onChange={(e) => setTarefa({ ...tarefa, responsavel: e.target.value })}
           >
             <option value="">Selecione um responsável *</option>
-
-            {funcionarios.map((funcionario) => (
-              <option key={funcionario.id} value={funcionario.id}>
-                {funcionario.nome}
-              </option>
+            {funcionarios.map((f) => (
+              <option key={f.id} value={f.id}>{f.nome}</option>
             ))}
           </select>
-
           <input
             className="inputPrazo"
             type="date"
             value={tarefa.prazo}
-            onChange={(e) =>
-              setTarefa({ ...tarefa, prazo: e.target.value })
-            }
+            onChange={(e) => setTarefa({ ...tarefa, prazo: e.target.value })}
           />
-
           <button className="btnAdicionar" onClick={salvarTarefa}>
             {modoEdicao ? "Editar" : "Adicionar"}
           </button>
-
           {modoEdicao && (
-            <button className="btnCancelar" onClick={limparFormulario}>
-              Cancelar
-            </button>
+            <button className="btnCancelar" onClick={limparFormulario}>Cancelar</button>
           )}
         </div>
 
-        <table className="tabela">
-          <thead>
-            <tr className="tabelaHeader">
-              <th className="th">Título</th>
-              <th className="th">Descrição</th>
-              <th className="th">Responsável</th>
-              <th className="th">Prazo</th>
-              <th className="th">Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tarefas
-              .filter((t) => {
-                const termoBusca = busca.toLowerCase();
-                return (
-                  t.titulo.toLowerCase().includes(termoBusca) ||
-                  t.descricao.toLowerCase().includes(termoBusca) ||
-                  t.responsavel.toLowerCase().includes(termoBusca)
-                );
-              })
-              .map((tarefaAtual) => (
+        {/* Wrapper com scroll horizontal */}
+        <div className="tabelaWrapper">
+          <table className="tabela">
+            <thead>
+              <tr className="tabelaHeader">
+                <th className="th">Título</th>
+                <th className="th">Descrição</th>
+                <th className="th">Responsável</th>
+                <th className="th">Prazo</th>
+                <th className="th">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tarefasFiltradas.map((tarefaAtual) => (
                 <tr key={tarefaAtual.id} className="tabelaLinha">
                   <td className="td">{tarefaAtual.titulo}</td>
                   <td className="td">{tarefaAtual.descricao}</td>
@@ -255,26 +201,23 @@ function Tarefas() {
                       >
                         Editar
                       </button>
-                      <button
-                        className="btnExcluir"
-                        onClick={() => excluirTarefa(tarefaAtual.id)}
-                      >
+                      <button className="btnExcluir" onClick={() => excluirTarefa(tarefaAtual.id)}>
                         Excluir
                       </button>
                     </div>
                   </td>
                 </tr>
               ))}
-
-            {tarefas.length === 0 && (
-              <tr className="tabelaLinha">
-                <td className="td" colSpan={5} style={{ color: "#777" }}>
-                  Nenhuma tarefa cadastrada
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              {tarefas.length === 0 && (
+                <tr className="tabelaLinha">
+                  <td className="td" colSpan={5} style={{ color: "#777" }}>
+                    Nenhuma tarefa cadastrada
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </Layout>
   );
