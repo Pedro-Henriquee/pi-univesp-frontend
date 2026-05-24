@@ -26,35 +26,28 @@ function Funcionarios() {
 
   async function buscarFuncionario() {
     const nome = inputNomeFiltro.current.value;
-
     if (!nome || nome.trim() === "") {
       carregarFuncionarios();
       return;
     }
-
-    const { data } = await api.get("/funcionarios", {
-      params: { nome },
-    });
-
+    const { data } = await api.get("/funcionarios", { params: { nome } });
     setFuncionarios(data);
   }
 
   async function gravarFuncionario() {
-    if (!validateFields()) {
-      return;
-    }
+    if (!validateFields()) return;
 
     if (editandoId) {
       await api.put(`/funcionarios/${editandoId}`, {
         nome: inputNome.current.value,
         cargo: inputCargo.current.value,
-        username: inputUsuario.current.value || null
+        username: inputUsuario.current.value || null,
       });
     } else {
       await api.post("/funcionarios/criar", {
         nome: inputNome.current.value,
         cargo: inputCargo.current.value,
-        username: inputUsuario.current.value || null
+        username: inputUsuario.current.value || null,
       });
     }
 
@@ -72,9 +65,7 @@ function Funcionarios() {
   }
 
   async function tornarAdmin(id) {
-    await api.put(`/funcionarios/${id}/admin`, {
-      is_admin: true,
-    });
+    await api.put(`/funcionarios/${id}/admin`, { is_admin: true });
     alert("Funcionário promovido a admin com sucesso!");
     carregarFuncionarios();
   }
@@ -95,16 +86,10 @@ function Funcionarios() {
 
   useEffect(() => {
     let ativo = true;
-
     api.get("/funcionarios").then(({ data }) => {
-      if (ativo) {
-        setFuncionarios(data);
-      }
+      if (ativo) setFuncionarios(data);
     });
-
-    return () => {
-      ativo = false;
-    };
+    return () => { ativo = false; };
   }, []);
 
   return (
@@ -129,82 +114,61 @@ function Funcionarios() {
         </h2>
 
         <div className="inputsContainer">
-          <input
-            className="inputForm"
-            name="nome"
-            placeholder="Nome *"
-            ref={inputNome}
-          />
-          <input
-            className="inputForm"
-            name="cargo"
-            placeholder="Cargo *"
-            ref={inputCargo}
-          /><input
-            className="inputForm"
-            name="usuario"
-            placeholder="Usuário (opcional)"
-            ref={inputUsuario}
-          />
+          <input className="inputForm" name="nome" placeholder="Nome *" ref={inputNome} />
+          <input className="inputForm" name="cargo" placeholder="Cargo *" ref={inputCargo} />
+          <input className="inputForm" name="usuario" placeholder="Usuário (opcional)" ref={inputUsuario} />
           <button className="btnAdicionar" onClick={gravarFuncionario}>
             {editandoId ? "Salvar" : "Adicionar"}
           </button>
           {editandoId && (
-            <button className="btnCancelar" onClick={limparCampos}>
-              Cancelar
-            </button>
+            <button className="btnCancelar" onClick={limparCampos}>Cancelar</button>
           )}
         </div>
 
-        <table className="tabela">
-          <thead>
-            <tr className="tabelaHeader">
-              <th className="th">Nome</th>
-              <th className="th">Cargo</th>
-              <th className="th">Usuário</th>
-              <th className="th">Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {funcionarios.map((funcionario) => (
-              <tr key={funcionario.id} className="tabelaLinha">
-                <td className="td">{funcionario.nome}{funcionario.is_admin && <span className="adminBadge"> (ADMIN) </span>}</td>
-                <td className={`td ${!funcionario.cargo ? "semCargo" : ""}`}>
-                  {funcionario.cargo || "SEM CARGO"}
-                </td>
-                <td
-                  className={`td ${!funcionario.username ? "naoAutenticado" : ""}`}
-                >
-                  {funcionario.username || "NÃO CADASTRADO"}
-                </td>
-                <td className="td">
-                  <div className="acoes">
-                    {funcionario.username && !funcionario.is_admin ? (
-                      <button
-                        className="btnAdmin"
-                        onClick={() => tornarAdmin(funcionario.id)}
-                      >
-                        Tornar admin
-                      </button>
-                    ) : null}
-                    <button
-                      className="btnEditar"
-                      onClick={() => editarFuncionario(funcionario)}
-                    >
-                      Editar
-                    </button>
-                    <button
-                      className="btnExcluir"
-                      onClick={() => deletarFuncionario(funcionario.id)}
-                    >
-                      Excluir
-                    </button>
-                  </div>
-                </td>
+        {/* Wrapper garante scroll horizontal na tabela */}
+        <div className="tabelaWrapper">
+          <table className="tabela">
+            <thead>
+              <tr className="tabelaHeader">
+                <th className="th">Nome</th>
+                <th className="th">Cargo</th>
+                <th className="th">Usuário</th>
+                <th className="th">Ações</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {funcionarios.map((funcionario) => (
+                <tr key={funcionario.id} className="tabelaLinha">
+                  <td className="td">
+                    {funcionario.nome}
+                    {funcionario.is_admin && <span className="adminBadge"> (ADMIN)</span>}
+                  </td>
+                  <td className={`td ${!funcionario.cargo ? "semCargo" : ""}`}>
+                    {funcionario.cargo || "SEM CARGO"}
+                  </td>
+                  <td className={`td ${!funcionario.username ? "naoAutenticado" : ""}`}>
+                    {funcionario.username || "NÃO CADASTRADO"}
+                  </td>
+                  <td className="td">
+                    <div className="acoes">
+                      {funcionario.username && !funcionario.is_admin && (
+                        <button className="btnAdmin" onClick={() => tornarAdmin(funcionario.id)}>
+                          Tornar admin
+                        </button>
+                      )}
+                      <button className="btnEditar" onClick={() => editarFuncionario(funcionario)}>
+                        Editar
+                      </button>
+                      <button className="btnExcluir" onClick={() => deletarFuncionario(funcionario.id)}>
+                        Excluir
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </Layout>
   );

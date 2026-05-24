@@ -81,13 +81,19 @@
   cursor: pointer;
 }
 
+.tabelaWrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
 .tabela {
   width: 100%;
+  min-width: 560px;
   border-collapse: collapse;
   background: #fff;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
 .tabelaHeader {
@@ -100,6 +106,7 @@
   font-size: 14px;
   font-weight: 600;
   color: #444;
+  white-space: nowrap;
 }
 
 .tabelaLinha {
@@ -108,9 +115,10 @@
 
 .td {
   padding: 12px 16px;
-  max-width: 250px;
   font-size: 14px;
   color: #333;
+  max-width: 200px;
+  word-break: break-word;
 }
 
 .adminBadge {
@@ -128,17 +136,15 @@
 
 .acoes {
   display: flex;
-  gap: 10px;
+  gap: 6px;
   align-items: center;
-  justify-content: flex-start;
+  flex-wrap: nowrap;
 }
 
 .btnAdmin,
 .btnEditar,
 .btnExcluir {
-  width: 100px;
-  flex: 0 0 100px;
-  padding: 6px 0;
+  padding: 6px 10px;
   color: #fff;
   border: none;
   border-radius: 4px;
@@ -157,4 +163,26 @@
 
 .btnExcluir {
   background: #c0392b;
+}
+
+/* ── MOBILE ── */
+@media (max-width: 700px) {
+  .buscaInputContainer {
+    width: 100%;
+  }
+
+  .inputsContainer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .inputForm {
+    width: 100%;
+  }
+
+  .btnAdicionar,
+  .btnCancelar {
+    width: 100%;
+    text-align: center;
+  }
 }
